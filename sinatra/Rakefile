@@ -1,20 +1,21 @@
 require "rake"
-require "hanami/rake_tasks"
-require "csv"
 
-begin
-  require "rspec/core/rake_task"
-  RSpec::Core::RakeTask.new(:spec)
-  task default: :spec
-rescue LoadError
+namespace :db do
+  task :migrate, [:version] do |t, args|
+    require "sequel"
+    require "./db"
+    Sequel.extension :migration
+    version = args[:version].to_i if args[:version]
+    Sequel::Migrator.run(DB, "migrations", target: version)
+  end
 end
 
-task create_movies: :environment do
-  csv = CSV.read("#{__dir__}/db/movies.csv", headers: true,  encoding: "ISO-8859-1")
-  repository = MovieRepository.new
-
-  movies = csv.each do |line|
-    repository.create(
+task :create_movies do
+  require "csv"
+  require "./server"
+  csv = CSV.read("#{__dir__}/movies.csv", headers: true,  encoding: "ISO-8859-1")
+  movies = csv.map do |line|
+    {
       rank: line["Rank"],
       title: line["Title"],
       description: line["Description"],
@@ -26,9 +27,13 @@ task create_movies: :environment do
       gross_earning_on_million: use_if_float(line["Gross_Earning_in_Mil"]),
       director: line["Director"],
       actor: line["Actor"],
-      year: line["Year"]
-    )
+      year: line["Year"],
+      updated_at: Time.now,
+      created_at: Time.now
+    }
   end
+
+  DB[:movies].multi_insert(movies)
 end
 
 def use_if_integer(value)
