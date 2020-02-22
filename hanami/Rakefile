@@ -1,0 +1,36 @@
+require "rake"
+require "hanami/rake_tasks"
+require "csv"
+
+begin
+  require "rspec/core/rake_task"
+  RSpec::Core::RakeTask.new(:spec)
+  task default: :spec
+rescue LoadError
+end
+
+task create_movies: :environment do
+  csv = CSV.read("#{__dir__}/db/movies.csv", headers: true,  encoding: "ISO-8859-1")
+  repository = MovieRepository.new
+
+  movies = csv.each do |line|
+    repository.create(
+      rank: line["Rank"],
+      title: line["Title"],
+      description: line["Description"],
+      runtime: line["Runtime"],
+      genre: line["Genre"],
+      rating: line["Rating"],
+      metascore: use_if(line["Metascore"], Integer),
+      votes: use_if(line["Votes"], Integer),
+      gross_earning_on_million: use_if(line["Gross_Earning_in_Mil"], Integer),
+      director: line["Director"],
+      actor: line["Actor"],
+      year: line["Year"]
+    )
+  end
+end
+
+def use_if(value, klass)
+  value.is_a?(klass) ? value : nil
+end
