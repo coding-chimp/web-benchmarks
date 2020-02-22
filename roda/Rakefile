@@ -1,0 +1,45 @@
+require "rake"
+
+namespace :db do
+  task :migrate, [:version] do |t, args|
+    require "sequel"
+    require "./db"
+    Sequel.extension :migration
+    version = args[:version].to_i if args[:version]
+    Sequel::Migrator.run(DB, "migrations", target: version)
+  end
+end
+
+task :create_movies do
+  require "csv"
+  require "./server"
+  csv = CSV.read("#{__dir__}/movies.csv", headers: true,  encoding: "ISO-8859-1")
+  movies = csv.map do |line|
+    {
+      rank: line["Rank"],
+      title: line["Title"],
+      description: line["Description"],
+      runtime: line["Runtime"],
+      genre: line["Genre"],
+      rating: line["Rating"],
+      metascore: use_if_integer(line["Metascore"]),
+      votes: use_if_integer(line["Votes"]),
+      gross_earning_on_million: use_if_float(line["Gross_Earning_in_Mil"]),
+      director: line["Director"],
+      actor: line["Actor"],
+      year: line["Year"],
+      updated_at: Time.now,
+      created_at: Time.now
+    }
+  end
+
+  DB[:movies].multi_insert(movies)
+end
+
+def use_if_integer(value)
+  value.to_i.to_s == value ? value : nil
+end
+
+def use_if_float(value)
+  value.to_f.to_s == value ? value : nil
+end
