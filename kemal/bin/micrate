@@ -1,0 +1,8 @@
+#! /usr/bin/env crystal
+
+require "micrate"
+require "pg"
+
+DATABASE_URL = ENV.fetch("DATABASE_URL", "postgres://localhost/kemal_development")
+Micrate::DB.connection_url = DATABASE_URL
+Micrate::Cli.run
