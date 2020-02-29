@@ -1,0 +1,8 @@
+source "https://rubygems.org"
+
+ruby "2.7.0"
+
+gem "hanami-api"
+gem "pg"
+gem "puma"
+gem "sequel"
