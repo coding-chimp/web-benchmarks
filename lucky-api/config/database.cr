@@ -1,4 +1,4 @@
-database_name = "lucky_#{Lucky::Env.name}"
+database_name = "web_benchmark_#{Lucky::Env.name}"
 
 AppDatabase.configure do |settings|
   if Lucky::Env.production?

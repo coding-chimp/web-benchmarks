@@ -1,10 +1,14 @@
 require "sinatra"
-require "./db"
+require "sequel"
+
+DATABASE_URL = ENV.fetch("DATABASE_URL", "postgres://localhost/web_benchmark_development")
+DB = Sequel.connect(DATABASE_URL)
 
 class Movie < Sequel::Model
   def to_h
     {
       id: id,
+      rank: rank,
       title: title,
       description: description,
       runtime: runtime,

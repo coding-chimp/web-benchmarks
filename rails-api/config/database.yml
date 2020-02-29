@@ -5,7 +5,7 @@ default: &default
 
 development:
   <<: *default
-  database: rails_api_development
+  database: web_benchmark_development
 
 test:
   <<: *default
@@ -13,6 +13,4 @@ test:
 
 production:
   <<: *default
-  database: rails_api_production
-  username: rails_api
-  password: <%= ENV["RAILS_API_DATABASE_PASSWORD"] %>
+  url:  <%= ENV["DATABASE_URL"] %>

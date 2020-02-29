@@ -8,10 +8,10 @@ class Movie < Granite::Base
   column description : String?
   column runtime : Int32?
   column genre : String?
-  column rating : Float64?
+  column rating : Float64?, converter: Granite::Converters::PgNumeric
   column metascore : Int32?
   column votes : Int32?
-  column gross_earning_on_million : Float64?
+  column gross_earning_on_million : Float64?, converter: Granite::Converters::PgNumeric
   column director : String?
   column actor : String?
   column year : Int32?
